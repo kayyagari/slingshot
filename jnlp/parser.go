@@ -132,16 +132,16 @@ func downloadJars(baseDir string, jnlp *Jnlp, cl http.Client) error {
 	return nil
 }
 
-func ParseAndDownload(jnlpUrl string) (string, error) {
+func ParseAndDownload(jnlpUrl string) (string, *Jnlp, error) {
 	j, err := ParseFromUrl(jnlpUrl)
 	if err != nil {
-		return "", err
+		return "", nil, err
 	}
 
 	dirPath, err := Download(j)
 	if err != nil {
-		return "", err
+		return "", nil, err
 	}
 
-	return dirPath, nil
+	return dirPath, j, nil
 }

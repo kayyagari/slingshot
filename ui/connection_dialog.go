@@ -21,12 +21,30 @@ func NewConnectionDialog() *ConnectionDialog {
 	cd.w = w
 
 	urlEntry := widget.NewEntry()
-	urlBox := widget.NewHBox(widget.NewLabel("URL:"), urlEntry)
+	urlEntry.SetText("http://localhost:8080/webstart.jnlp")
+
+	usernameEntry := widget.NewEntry()
+	usernameEntry.SetText("admin")
+
+	passwordEntry := widget.NewPasswordEntry()
+	passwordEntry.SetText("admin")
+
+	fiUrl := &widget.FormItem{"URL:", urlEntry}
+	fiUsername := &widget.FormItem{"Username:", usernameEntry}
+	fiPassword := &widget.FormItem{"Password:", passwordEntry}
+
+	form := widget.NewForm(fiUrl, fiUsername, fiPassword)
 	w.SetContent(widget.NewVBox(
-		urlBox,
+		form,
 		widget.NewButton("Run", func() {
-			dirPath, err := jnlp.ParseAndDownload(urlEntry.Text)
+			dirPath, j, err := jnlp.ParseAndDownload(urlEntry.Text)
 			fmt.Println(dirPath, err)
+			args := j.ApplicationDesc.Argument
+			if usernameEntry.Text != "" {
+				args = append(args, usernameEntry.Text)
+				args = append(args, passwordEntry.Text)
+			}
+			jnlp.RunJar(dirPath, j.ApplicationDesc.MainClass, nil, args)
 		})))
 
 	return cd
